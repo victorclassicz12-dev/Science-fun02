@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ScienceFun</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { background:#0d0f25; color:#fff; font-family:sans-serif; text-align:center; }
+    .screen{display:none; padding:20px;}
+    .active{display:block;}
+    button{padding:10px 20px; margin:10px; border:none; border-radius:10px; cursor:pointer;}
+    #timer {font-size:1.2em; margin:15px;}
+    #progress {height:10px;background:#34d399;transition:width 1s linear;}
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</head>
+<body>
+  <div id="intro" class="screen active">
+    <h1>Welcome to ScienceFun 🔬⚛️</h1>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="game" class="screen">
+    <div id="question"></div>
+    <div id="answers"></div>
+    <div id="timer">15</div>
+    <div style="width:100%;background:#333;"><div id="progress"></div></div>
+    <div>Score: <span id="score">0</span></div>
+  </div>
+
+<script>
+let questions = [
+ {q:"What is H2O?",a:["Oxygen","Hydrogen","Water","Salt"],correct:2},
+ {q:"Powerhouse of the cell?",a:["Nucleus","Mitochondria","Chloroplast","Ribosome"],correct:1},
+ {q:"Acceleration due to gravity?",a:["5 m/s²","9.8 m/s²","12 m/s²","7 m/s²"],correct:1}
+];
+let current=0,score=0,timer, timeLeft=15;
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function startGame(){current=0;score=0;showScreen('game');nextQ();}
+function nextQ(){if(current>=questions.length){alert('Game over! Score:'+score);return;}let q=questions[current];document.getElementById('question').textContent=q.q;let ans=document.getElementById('answers');ans.innerHTML='';q.a.forEach((opt,i)=>{let b=document.createElement('button');b.textContent=opt;b.onclick=()=>choose(i);ans.appendChild(b);});timeLeft=15;document.getElementById('timer').textContent=timeLeft;document.getElementById('progress').style.width='100%';clearInterval(timer);timer=setInterval(countDown,1000);}
+function countDown(){timeLeft--;document.getElementById('timer').textContent=timeLeft;document.getElementById('progress').style.width=(timeLeft/15*100)+'%';if(timeLeft<=0){clearInterval(timer);wrong();}}
+function choose(i){clearInterval(timer);if(i==questions[current].correct){score+=10;}else{score-=5;}document.getElementById('score').textContent=score;current++;nextQ();}
+function wrong(){score-=5;document.getElementById('score').textContent=score;current++;nextQ();}
+</script>
+</body>
+</html>
